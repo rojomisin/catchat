@@ -23,6 +23,10 @@ const (
 	green  = "\x1b[38;5;114m"
 	yellow = "\x1b[38;5;221m"
 	gray   = "\x1b[38;5;245m"
+
+	// Raw terminal mode disables output post-processing, so LF alone does not
+	// return the cursor to column zero in Terminal, Ghostty, and many others.
+	lineEnd = "\r\n"
 )
 
 type inputEvent struct {
@@ -43,7 +47,7 @@ func Run(conn net.Conn, nick string) error {
 		return fmt.Errorf("enable raw terminal mode: %w", err)
 	}
 	defer term.Restore(int(os.Stdin.Fd()), oldState)
-	defer fmt.Fprint(os.Stdout, reset+"\x1b[?25h\n")
+	defer fmt.Fprint(os.Stdout, reset+"\x1b[?25h"+lineEnd)
 
 	if err := chat.WriteFrame(conn, chat.Frame{Type: chat.TypeHello, Nick: nick}); err != nil {
 		return err
@@ -211,17 +215,17 @@ func (m *model) render() {
 
 	fmt.Fprint(os.Stdout, "\x1b[?25l\x1b[H\x1b[2J")
 	header := fmt.Sprintf(" CaTChaT  #lobby  |  %s  |  Tailcat/WireGuard ", m.nick)
-	fmt.Fprint(os.Stdout, cyan+bold+fitPlain(header, width)+reset+"\n")
-	fmt.Fprint(os.Stdout, gray+strings.Repeat("─", width)+reset+"\n")
+	fmt.Fprint(os.Stdout, cyan+bold+fitPlain(header, width)+reset+lineEnd)
+	fmt.Fprint(os.Stdout, gray+strings.Repeat("─", width)+reset+lineEnd)
 	for _, line := range lines {
-		fmt.Fprint(os.Stdout, line+"\n")
+		fmt.Fprint(os.Stdout, line+lineEnd)
 	}
 	for i := len(lines); i < available; i++ {
-		fmt.Fprint(os.Stdout, "\n")
+		fmt.Fprint(os.Stdout, lineEnd)
 	}
-	fmt.Fprint(os.Stdout, gray+strings.Repeat("─", width)+reset+"\n")
+	fmt.Fprint(os.Stdout, gray+strings.Repeat("─", width)+reset+lineEnd)
 	users := strings.Join(m.users, " ")
-	fmt.Fprintf(os.Stdout, "%s[%d users]%s %s\n", cyan, len(m.users), reset, fitPlain(users, width-12))
+	fmt.Fprintf(os.Stdout, "%s[%d users]%s %s%s", cyan, len(m.users), reset, fitPlain(users, width-12), lineEnd)
 	prompt := fitPlain(m.input, width-2)
 	if prompt == "" {
 		prompt = dim + "type a message  |  /help  |  ^C quit" + reset
