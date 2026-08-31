@@ -67,6 +67,26 @@ The invitation token embeds `derp.example.com`, so joining clients do not need
 to fetch Tailcat's public DERP map. Use `--derp-port` and `--stun-port` if your
 relay does not use ports 443 and 3478.
 
+## Android / GrapheneOS
+
+Releases include an `android_arm64` archive for Pixels and other 64-bit ARM
+Android devices. It is a terminal binary, not an APK. Use a terminal app that
+can execute native binaries and supports a raw terminal (for example, Termux),
+then install it in that app's private executable directory rather than from the
+shared Downloads directory.
+
+```sh
+# Inside the terminal app; replace VERSION with a release tag, such as v0.1.0.
+tar -xzf catchat_VERSION_android_arm64.tar.gz
+chmod 755 catchat_VERSION_android_arm64/catchat
+./catchat_VERSION_android_arm64/catchat help
+```
+
+After confirming it starts, move or copy `catchat` into the terminal app's
+`bin` directory and run `catchat join --nick alice 'tc...'`. This target has
+been cross-compiled; actual Tailcat connectivity and terminal rendering still
+need to be smoke-tested on the device.
+
 ## Security model
 
 Tailcat encrypts the network hop from each client to the hub with WireGuard and
@@ -103,8 +123,8 @@ The test suite covers the bounded wire-frame parser and input validation.
 ## Releases
 
 GitHub Actions tests every pull request and push to `master`. Pushing a version
-tag publishes Darwin (Intel and Apple Silicon) and Linux (amd64 and arm64)
-archives to GitHub Releases:
+tag publishes Darwin (Intel and Apple Silicon), Linux (amd64 and arm64), and
+Android (arm64) archives to GitHub Releases:
 
 ```sh
 git tag v0.1.0

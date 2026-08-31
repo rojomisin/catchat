@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          for target in darwin/amd64 darwin/arm64 linux/amd64 linux/arm64; do
+          for target in darwin/amd64 darwin/arm64 linux/amd64 linux/arm64 android/arm64; do
             GOOS="${target%/*}"
             GOARCH="${target#*/}"
             archive="catchat_${VERSION}_${GOOS}_${GOARCH}"
