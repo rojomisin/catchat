@@ -20,6 +20,9 @@ import (
 
 const defaultPort = 6667
 
+// version is set to the release tag by the GitHub release workflow.
+var version = "dev"
+
 func main() {
 	if len(os.Args) < 2 {
 		usage()
@@ -32,6 +35,9 @@ func main() {
 		err = serve(os.Args[2:])
 	case "join":
 		err = join(os.Args[2:])
+	case "version", "--version":
+		fmt.Printf("catchat %s\n", version)
+		return
 	case "help", "-h", "--help":
 		usage()
 		return
@@ -133,6 +139,7 @@ func usage() {
 Usage:
   catchat serve [--port 6667] [--derp derp.example.com]
   catchat join --nick alice [--port 6667] <invitation-token>
+  catchat version
 
 The host prints a Tailcat invitation token. Share it out of band, then peers
 join it from an interactive terminal. Tailcat encrypts transport traffic and

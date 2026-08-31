@@ -52,6 +52,7 @@ Build a standalone binary with:
 
 ```sh
 go build -o catchat ./cmd/catchat
+catchat version # prints "catchat dev" for local builds
 ```
 
 ## Bring your own DERP

@@ -29,7 +29,7 @@ jobs:
             archive="catchat_${VERSION}_${GOOS}_${GOARCH}"
             mkdir -p "dist/${archive}"
             CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" \
-              go build -trimpath -ldflags='-s -w' -o "dist/${archive}/catchat" ./cmd/catchat
+              go build -trimpath -ldflags="-s -w -X main.version=${VERSION}" -o "dist/${archive}/catchat" ./cmd/catchat
             tar -C dist -czf "dist/${archive}.tar.gz" "${archive}"
             rm -rf "dist/${archive}"
           done
