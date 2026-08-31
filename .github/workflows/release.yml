@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          check-latest: true
+      - name: Build release archives
+        env:
+          VERSION: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          for target in darwin/amd64 darwin/arm64 linux/amd64 linux/arm64; do
+            GOOS="${target%/*}"
+            GOARCH="${target#*/}"
+            archive="catchat_${VERSION}_${GOOS}_${GOARCH}"
+            mkdir -p "dist/${archive}"
+            CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" \
+              go build -trimpath -ldflags='-s -w' -o "dist/${archive}/catchat" ./cmd/catchat
+            tar -C dist -czf "dist/${archive}.tar.gz" "${archive}"
+            rm -rf "dist/${archive}"
+          done
+          sha256sum dist/*.tar.gz > dist/checksums.txt
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          files: |
+            dist/*.tar.gz
+            dist/checksums.txt

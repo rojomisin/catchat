@@ -99,3 +99,14 @@ go vet ./...
 ```
 
 The test suite covers the bounded wire-frame parser and input validation.
+
+## Releases
+
+GitHub Actions tests every pull request and push to `master`. Pushing a version
+tag publishes Darwin (Intel and Apple Silicon) and Linux (amd64 and arm64)
+archives to GitHub Releases:
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
